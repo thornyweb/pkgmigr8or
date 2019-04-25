@@ -7,7 +7,7 @@ pkgmigr8or (Package migrater) is a Migration CLI tool to export packages from NP
 ## Installation
 
 ```sh
-npm install -g migr8er
+npm install -g pkgmigr8or
 ```
 
 ## Pre-Requisites
@@ -30,7 +30,7 @@ The script takes 2 arguments:
 2. The URL of your private registry you are migrating to.
 
 ```sh
-migr8er packages.txt http://localhost:4873
+pkgmigr8or packages.txt http://localhost:4873
 ```
 
 ### Defining your packages.
