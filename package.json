@@ -3,9 +3,10 @@
   "version": "1.0.0-alpha",
   "description": "A CLI tool to help you migrate packages from NPM to a private registry",
   "main": "index.js",
+  "bin": "./index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thornyweb/migr8er.git"
+    "url": "git+https://github.com/thornyweb/pkgmigr8or.git"
   },
   "keywords": [
     "migrate",
@@ -25,7 +26,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/thornyweb/migr8er/issues"
+    "url": "https://github.com/thornyweb/pkgmigr8or/issues"
   },
-  "homepage": "https://github.com/thornyweb/migr8er#readme"
+  "homepage": "https://github.com/thornyweb/pkgmigr8or#readme"
 }
