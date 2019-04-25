@@ -22,7 +22,9 @@ You can `cat ~/.npmrc` and should be able to see tokens for both registries.
 
 ## Usage
 
-The CLI takes 2 arguments:
+Create a directory somewhere and point your CLI in to it.
+
+The script takes 2 arguments:
 
 1. A file which contains a list of all the packages you want to export.
 2. The URL of your private registry you are migrating to.
@@ -33,7 +35,7 @@ migr8er packages.txt http://localhost:4873
 
 ### Defining your packages.
 
-Create a file in your directory e.g. `packages.txt`.
+Create a plain text file in your directory e.g. `packages.txt`.
 
 Each line represents a new package
 
