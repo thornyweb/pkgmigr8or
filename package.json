@@ -1,6 +1,6 @@
 {
   "name": "migr8er",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha",
   "description": "A CLI tool to help you migrate packages from NPM to a private registry",
   "main": "index.js",
   "repository": {
