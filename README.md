@@ -1,8 +1,8 @@
-# migr8er
+# pkgmigr8or
 
 # Version 1 coming 27/04/2019
 
-Migration CLI tool to export packages from NPM to a private registry e.g. [Verdaccio](https://verdaccio.org/).
+pkgmigr8or (Package migrater) is a Migration CLI tool to export packages from NPM to a private registry e.g. [Verdaccio](https://verdaccio.org/).
 
 ## Installation
 
