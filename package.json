@@ -1,6 +1,6 @@
 {
   "name": "pkgmigr8or",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0",
   "description": "A CLI tool to help you migrate packages from NPM to a private registry",
   "main": "index.js",
   "bin": "./index.js",
