@@ -28,5 +28,9 @@
   "bugs": {
     "url": "https://github.com/thornyweb/pkgmigr8or/issues"
   },
-  "homepage": "https://github.com/thornyweb/pkgmigr8or#readme"
+  "homepage": "https://github.com/thornyweb/pkgmigr8or#readme",
+  "dependencies": {
+    "cli-progress": "^2.1.1",
+    "semver": "^6.0.0"
+  }
 }
