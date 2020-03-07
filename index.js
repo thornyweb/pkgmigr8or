@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-const exec = require("child_process").exec;
+const util = require('util');
+const exec = util.promisify(require("child_process").exec);
 const fs = require("fs");
 const _cliProgress = require("cli-progress");
 const semver = require("semver");
@@ -10,7 +11,8 @@ const PACKAGE_FILE_PATH = process.argv[2];
 const PACKAGE_FILE_DATA = fs
   .readFileSync(PACKAGE_FILE_PATH)
   .toString()
-  .split("\n");
+  .split("\n")
+  .filter(x => x !== '');
 
 if (!NEW_REGISTRY_URL) {
   throw "You must provide a URL for your new registry.";
@@ -40,32 +42,26 @@ function resolveAllConcurrent(proms, progress_cb, concurrency = 10) {
   );
 }
 
-const getVersionsForPackage = package =>
-  new Promise((resolve, reject) => {
-    const limitPackageVersions = package.indexOf("#") > 0;
-    let packageName = package;
-    let packageVersionLimit;
-    if (limitPackageVersions) {
-      const splitPackage = package.split("#");
-      packageName = splitPackage[0];
-      packageVersionLimit = splitPackage[1];
-    }
-    exec("npm view " + packageName + " versions", (e, out) => {
-      if (e) {
-        return reject(e);
-      }
-      resolve(
-        JSON.parse(out.replace(/'/g, '"'))
-          .filter(
-            version =>
-              !limitPackageVersions ||
-              (limitPackageVersions &&
-                semver.satisfies(version, packageVersionLimit))
-          )
-          .map(version => packageName + "@" + version)
-      );
-    });
-  });
+const getVersionsForPackage = async package => {
+  const limitPackageVersions = package.indexOf("#") > 0;
+  let packageName = package;
+  let packageVersionLimit;
+  if (limitPackageVersions) {
+    const splitPackage = package.split("#");
+    packageName = splitPackage[0];
+    packageVersionLimit = splitPackage[1];
+  }
+  const { stdout } = await exec("npm view " + packageName + " versions");
+
+  return JSON.parse(stdout.replace(/'/g, '"'))
+    .filter(
+      version =>
+        !limitPackageVersions ||
+        (limitPackageVersions &&
+          semver.satisfies(version, packageVersionLimit))
+    )
+    .map(version => packageName + "@" + version);
+};
 
 const bar1 = new _cliProgress.Bar({}, _cliProgress.Presets.shades_classic);
 const bar2 = new _cliProgress.Bar({}, _cliProgress.Presets.shades_classic);
@@ -95,38 +91,28 @@ bar1.start(PACKAGE_FILE_DATA.length, 0);
   bar2.start(packageVersionsFlat.length, 0);
 
   await resolveAllConcurrent(
-    packageVersionsFlat.map(packageVersion => {
-      return () =>
-        new Promise((resolve, reject) => {
-          exec(`npm pack ${packageVersion}`, (e, out) => {
-            if (e) return reject(e);
-            resolve(tarballFiles.push(out.replace("\n", "")));
-          });
-        });
+    packageVersionsFlat.map(packageVersion => async () => {
+      const { stdout } = await exec(`npm pack ${packageVersion}`);
+      tarballFiles.push([packageVersion, stdout.replace("\n", "")]);
     }),
     p => bar2.update(p)
   );
 
   bar2.stop();
 
+  // Sort according to packageVersionsFlat order
+  tarballFiles = tarballFiles.sort((a, b) => packageVersionsFlat.indexOf(a[0]) - packageVersionsFlat.indexOf(b[0])).map(x => x[1]);
+
   console.log("Publishing " + tarballFiles.length + " tarballs...");
 
   bar3.start(tarballFiles.length, 0);
 
   await resolveAllConcurrent(
-    tarballFiles.map(tarball => {
-      return () =>
-        new Promise((resolve, reject) => {
-          exec(
-            `npm publish "${process.cwd()}/${tarball}" --registry=${NEW_REGISTRY_URL}`,
-            (e, out) => {
-              if (e) return reject(e);
-              resolve();
-            }
-          );
-        });
-    }),
-    p => bar3.update(p)
+    tarballFiles.map(tarball => () =>
+      exec(`npm publish "${process.cwd()}/${tarball}" --registry=${NEW_REGISTRY_URL}`)
+    ),
+    p => bar3.update(p),
+    1
   );
 
   bar3.stop();
