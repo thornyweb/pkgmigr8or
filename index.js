@@ -53,6 +53,10 @@ const getVersionsForPackage = async package => {
   }
   const { stdout } = await exec("npm view " + packageName + " versions");
 
+  // packages with only one version return string with version number
+  if (stdout[0] != '[') {
+    return [packageName + "@" + stdout.replace(/\n/g, '')];
+  }
   return JSON.parse(stdout.replace(/'/g, '"'))
     .filter(
       version =>
